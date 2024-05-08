@@ -1,0 +1,65 @@
+// C++ code
+//
+#include <LiquidCrystal.h>
+
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);  // Initialize the LCD display with the corresponding pin connections
+
+const int currentPin = A0;  // Analog input pin for current measurement
+const int voltagePin = A1;  // Analog input pin for voltage measurement
+
+const int currentIndicatorPin = 8;   // Digital output pin for current indicator LED
+const int voltageIndicatorPin = 9;   // Digital output pin for voltage indicator LED
+const int powerIndicatorPin = 10;    // Digital output pin for power indicator LED
+
+const float voltageMultiplier = 0.0048828125;  // Calibration factor for voltage measurement
+const float currentMultiplier = 0.185;         // Calibration factor for current measurement
+
+void setup() {
+  lcd.begin(16, 2);  // Initialize the LCD display with 16 columns and 2 rows
+
+  pinMode(currentIndicatorPin, OUTPUT);
+  pinMode(voltageIndicatorPin, OUTPUT);
+  pinMode(powerIndicatorPin, OUTPUT);
+}
+
+void loop() {
+  // Read voltage and current values
+  float voltage = analogRead(voltagePin) * voltageMultiplier;
+  float current = analogRead(currentPin) * currentMultiplier;
+
+  // Calculate power consumption
+  float power = voltage * current;
+
+  // Update LCD display
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Voltage: ");
+  lcd.print(voltage);
+  lcd.print(" V");
+
+  lcd.setCursor(0, 1);
+  lcd.print("Current: ");
+  lcd.print(current);
+  lcd.print(" A");
+
+  // Update LED indicators based on thresholds
+  if (voltage > 4.5 && voltage < 5.5) {
+    digitalWrite(voltageIndicatorPin, HIGH);
+  } else {
+    digitalWrite(voltageIndicatorPin, LOW);
+  }
+
+  if (current > 0.0 && current < 0.3) {
+    digitalWrite(currentIndicatorPin, HIGH);
+  } else {
+    digitalWrite(currentIndicatorPin, LOW);
+  }
+
+  if (power > 0.3 && power < 1.5) {
+    digitalWrite(powerIndicatorPin, HIGH);
+  } else {
+    digitalWrite(powerIndicatorPin, LOW);
+  }
+
+  delay(1000);  // Delay for 1 second before reading again
+}
